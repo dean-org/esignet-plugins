@@ -98,7 +98,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>compile</scope>
-			<version>1.18.22</version>
+			<version>1.18.46</version>
 		</dependency>
 
 		<dependency>

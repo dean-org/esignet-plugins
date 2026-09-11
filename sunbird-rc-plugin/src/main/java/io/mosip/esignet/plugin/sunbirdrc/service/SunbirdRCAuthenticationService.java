@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import io.mosip.esignet.plugin.sunbirdrc.dto.RegistrySearchResponseDto;
 
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
@@ -231,7 +232,7 @@ public class SunbirdRCAuthenticationService implements Authenticator {
     public SendOtpResult sendOtp(String relyingPartyId, String clientId, SendOtpDto sendOtpDto)
             throws SendOtpException {
         throw new SendOtpException(ErrorConstants.NOT_IMPLEMENTED);
-        }
+    }
 
     @Override
     public boolean isSupportedOtpChannel(String channel) {
@@ -266,10 +267,10 @@ public class SunbirdRCAuthenticationService implements Authenticator {
                     .post(UriComponentsBuilder.fromUriString(registrySearchUrl).build().toUri())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .body(requestBody);
-            ResponseEntity<List<Map<String,Object>>> responseEntity = restTemplate.exchange(requestEntity,
-                    new ParameterizedTypeReference<List<Map<String,Object>>>() {});
+            ResponseEntity<RegistrySearchResponseDto>  responseEntity = restTemplate.exchange(requestEntity,
+                    new ParameterizedTypeReference<RegistrySearchResponseDto>() {});
             if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
-                List<Map<String,Object>> responseList = responseEntity.getBody();
+                List<Map<String,Object>> responseList = responseEntity.getBody().getData();
                 if(responseList != null && responseList.size()==1){
                     //TODO  This need to be removed since it can contain PII
                     log.debug("getting response {}", responseEntity);
