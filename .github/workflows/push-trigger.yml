@@ -20,7 +20,7 @@ on:
       - develop
       - MOSIP*
       - release*
-      - sun_as_id
+      - sub_as_id
 
 jobs:
   build-maven-mock-plugin:
