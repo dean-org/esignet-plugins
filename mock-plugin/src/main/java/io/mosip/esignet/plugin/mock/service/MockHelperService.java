@@ -59,6 +59,9 @@ public class MockHelperService {
 
     @Autowired
     private ObjectMapper objectMapper;
+    
+    @Value("${mosip.esignet.mock.authenticator.use-individual-id-as-psut:false}")
+    private boolean useIndividualIdAsPsut;
 
     private static final Map<String, List<String>> supportedKycAuthFormats = new HashMap<>();
 
@@ -183,7 +186,7 @@ public class MockHelperService {
             if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
                 ResponseWrapper<KycAuthResponseDtoV2> responseWrapper = responseEntity.getBody();
                 if (responseWrapper.getResponse() != null && responseWrapper.getResponse().isAuthStatus() && responseWrapper.getResponse().getKycToken() != null) {
-                    return buildKycAuthResult(responseWrapper.getResponse());
+                    return buildKycAuthResult(responseWrapper.getResponse(), kycAuthDto.getIndividualId());
                 }
                 log.error("Error response received from IDA, Errors: {}", responseWrapper.getErrors());
                 throw new KycAuthException(CollectionUtils.isEmpty(responseWrapper.getErrors()) ?
@@ -199,10 +202,10 @@ public class MockHelperService {
         throw new KycAuthException(ErrorConstants.AUTH_FAILED);
     }
 
-    private KycAuthResult buildKycAuthResult(KycAuthResponseDtoV2 response) {
+    private KycAuthResult buildKycAuthResult(KycAuthResponseDtoV2 response, String individualId) {
         KycAuthResult kycAuthResult = new KycAuthResult();
         kycAuthResult.setKycToken(response.getKycToken());
-        kycAuthResult.setPartnerSpecificUserToken(response.getPartnerSpecificUserToken());
+        kycAuthResult.setPartnerSpecificUserToken(useIndividualIdAsPsut && individualId != null ? individualId : response.getPartnerSpecificUserToken());
         kycAuthResult.setClaimsMetadata(response.getClaimMetadata());
         return kycAuthResult;
     }
